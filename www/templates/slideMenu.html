@@ -1,0 +1,47 @@
+<ion-side-menus>
+
+  <ion-pane ion-side-menu-content>
+    <ion-nav-bar class="bar-stable bar-positive" align-title="center">
+      <ion-nav-back-button class="button-clear"><i class="icon ion-chevron-left"></i> Back</ion-nav-back-button>
+    </ion-nav-bar>
+    <ion-nav-view name="menuContent" animation="slide-left-right"></ion-nav-view>
+  </ion-pane>
+
+  <ion-side-menu side="left">
+    <header class="bar bar-header bar-positive">
+      <h1 class="title">Gank.io</h1>
+    </header>
+    <ion-content class="has-header">
+      <ion-list>
+        <ion-item nav-clear menu-close href="#/app/fuli">
+          <i class="ion-android-favorite"></i>
+          <span style="margin-left: 20px;">福利</span>
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/web">
+          <i class="ion-social-html5"></i>
+          <span style="margin-left: 20px;">前端</span>
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/ios">
+          <i class="ion-social-apple"></i>
+          <span style="margin-left: 20px;">iOS</span>
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/android">
+          <i class="ion-social-android"></i>
+          <span style="margin-left: 20px;">Android</span>
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/expand">
+          <i class="ion-ios-eye"></i>
+          <span style="margin-left: 20px;">拓展资源</span>
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/video">
+          <i class="ion-film-marker"></i>
+          <span style="margin-left: 20px;">休息视频</span>
+        </ion-item>
+        <ion-item nav-clear menu-close href="#/app/about">
+          <i class="ion-information-circled"></i>
+          <span style="margin-left: 20px;">关于</span>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+  </ion-side-menu>
+</ion-side-menus>

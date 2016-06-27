@@ -1,0 +1,27 @@
+<ion-view view-title="每日福利">
+  <ion-nav-buttons side="left">
+    <button menu-toggle="left" class="button button-icon icon ion-navicon"></button>
+  </ion-nav-buttons>
+  <ion-content class="">
+    <ion-refresher pulling-text="下拉刷新" on-refresh="doRefresh()"></ion-refresher>
+    <div class="list card animated bounceInUp" ng-repeat="item in items">
+
+      <div class="item item-body" >
+        <img class="full-image" src={{item.url}} ng-click="showImages($index)">
+        <div style="margin-top:8px;">
+
+          <span style="color:#727272;"><i class="ion-person padding"></i>{{item.who}}</span>
+          <span style="display:inline-block;float:right;color:#727272;"><i class="ion-clock padding"></i>{{(item.publishedAt).split('T')[0]}}</span>
+        </div>
+        <!-- <p>
+          <a href="#" class="subdued"><i class="ion-android-favorite padding"></i>1000</a>
+          <a href="#" class="subdued"><i class="ion-android-chat padding"></i>5</a>
+        </p> -->
+      </div>
+
+    </div>
+    <ion-infinite-scroll on-infinite="loadMore()">
+      <ion-spinner icon="dots" class="spinner-dark spinner spinner-dots"></ion-spinner>
+    </ion-infinite-scroll>
+  </ion-content>
+</ion-view>

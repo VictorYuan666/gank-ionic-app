@@ -85,6 +85,15 @@ angular.module('starter', ['ionic','starter.controllers', 'starter.services'])
          }
        }
      })
+     .state('app.recommend', {
+       url: "/recommend",
+       views: {
+         'menuContent' :{
+           templateUrl: "templates/recommend.html",
+           controller: 'RecommendCtrl'
+         }
+       }
+     })
      .state('app.video', {
        url: "/video",
        views: {

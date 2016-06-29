@@ -289,6 +289,43 @@ angular.module('starter.controllers', [])
       $scope.loadMore();
     });
   })
+  .controller('RecommendCtrl', function($scope, $http, httpService, myService) {
+    var url = 'http://gank.io/api/data/%E7%9E%8E%E6%8E%A8%E8%8D%90/10/';
+    var page = 2;
+    $scope.webDatas = [];
+    $scope.pageTitle = "瞎推荐";
+    $scope.openLink = function(url) {
+      console.log(url);
+      window.open(url, '_blank', 'location=yes');
+    };
+    $scope.doRefresh = function() {
+      httpService.dataList(url + "1", function(datas) {
+        angular.forEach(datas, function(data, index, array) {
+          data.picUrl = myService.randomImageUrl();
+        });
+        $scope.webDatas = datas;
+        $scope.$broadcast('scroll.refreshComplete');
+      }, function(data) {
+        console.log(data);
+      });
+    };
+    $scope.doRefresh();
+    $scope.loadMore = function() {
+      httpService.dataList(url + (page++), function(datas) {
+        angular.forEach(datas, function(data, index, array) {
+          data.picUrl = myService.randomImageUrl();
+        });
+        $scope.webDatas = $scope.webDatas.concat(datas);
+        $scope.$broadcast('scroll.infiniteScrollComplete');
+      }, function(data) {
+        console.log(data);
+      });
+    };
+
+    $scope.$on('stateChangeSuccess', function() {
+      $scope.loadMore();
+    });
+  })
   .controller('AboutCtrl', function($scope) {
     $scope.pageTitle = "关于";
   });

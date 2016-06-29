@@ -4,10 +4,9 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('FuliCtrl', function($scope, $ionicModal, $http, $ionicActionSheet,$ionicPopup, $timeout, httpService) {
+.controller('FuliCtrl', function($scope, $ionicModal, $http, $ionicActionSheet, $ionicPopup, $timeout, $cordovaFileTransfer, httpService) {
   var url = 'http://gank.io/api/data/%E7%A6%8F%E5%88%A9/10/';
   var page = 2;
-  // var url = 'data.json';
   $scope.items = [];
 
   $scope.doRefresh = function() {
@@ -56,23 +55,60 @@ angular.module('starter.controllers', [])
     $scope.modal.hide();
     $scope.modal.remove();
   };
-  //
+
   $scope.onSwipeUp = function() {
     var myPopup = $ionicPopup.show({
-             title: '设为壁纸',
-             template: '是否把当前图片设为壁纸？',
-             scope: $scope,
-             buttons: [
-               { text: '取消' },
-               {
-                 text: '<b>确定</b>',
-                 type: 'button-positive',
-               },
-             ]
-           });
-           myPopup.then(function(res) {
-             console.log('Tapped!', res);
-           });
+      title: '下载图片',
+      template: '是否下载当前图片？',
+      scope: $scope,
+      buttons: [{
+        text: '取消'
+      }, {
+        text: '<b>确定</b>',
+        type: 'button-positive',
+      }, ]
+    });
+    myPopup.then(function(res) {
+      console.log('Tapped!', res);
+      var dd = function() {
+        window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, function(fs) {
+
+          console.log('file system open: ' + fs.name);
+
+          // Make sure you add the domain name to the Content-Security-Policy <meta> element.
+          var url = $scope.items[$scope.activeSlide].url;
+          var localFileName = url.substring(url.lastIndexOf('/') + 1);
+          // Parameters passed to getFile create a new file or return the file if it already exists.
+          fs.root.getFile(localFileName, {
+            create: true,
+            exclusive: false
+          }, function(fileEntry) {
+            console.log(fileEntry.fullPath);
+            var options = {};
+            $cordovaFileTransfer.download(url, 'file:///storage/emulated/0/Pictures/gank' + localFileName, options, true)
+              .then(function(result) {
+                console.log(result);
+                // Success!
+              }, function(err) {
+                console.log(err);
+                // Error
+              }, function(progress) {
+                $timeout(function() {
+                  $scope.downloadProgress = (progress.loaded / progress.total) * 100;
+                });
+              });
+
+          }, fail);
+
+        }, fail);
+      };
+
+      function fail(error) {
+        console.log(error);
+      }
+      dd();
+
+    });
 
 
   };
@@ -330,7 +366,7 @@ angular.module('starter.controllers', [])
     var url = 'http://gank.io/api/data/App/10/';
     var page = 2;
     $scope.webDatas = [];
-    $scope.pageTitle = "瞎推荐";
+    $scope.pageTitle = "App推荐";
     $scope.openLink = function(url) {
       console.log(url);
       window.open(url, '_blank', 'location=yes');

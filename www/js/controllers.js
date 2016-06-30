@@ -73,6 +73,7 @@ angular.module('starter.controllers', [])
 
       var dd = function() {
         window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, function(fs) {
+          console.log(fs.root.fullPath);
           fs.root.getDirectory("gankPic", {
               create: true
             },
@@ -81,7 +82,7 @@ angular.module('starter.controllers', [])
               console.log("创建目录失败");
             });
 
-          console.log('file system open: ' + fs.name);
+          console.log('file system open: ' + cordova.file.externalRootDirectory);
 
           // Make sure you add the domain name to the Content-Security-Policy <meta> element.
           var url = $scope.items[$scope.activeSlide].url;
@@ -91,13 +92,13 @@ angular.module('starter.controllers', [])
             create: true,
             exclusive: false
           }, function(fileEntry) {
-            console.log(fileEntry.toURL());
+            console.log(fileEntry);
             var options = {};
-            $cordovaFileTransfer.download(url, 'file:///storage/emulated/0/gankPic/' + localFileName, options, true)
+            $cordovaFileTransfer.download(url, cordova.file.externalRootDirectory+'gankPic/' + localFileName, options, true)
               .then(function(result) {
                 console.log(result);
                 // Success!
-                $cordovaToast.showLongBottom('图片已经在gankPic文件夹下了哦(╯3╰)').then(function(success) {
+                $cordovaToast.showLongBottom('图片已经下到gankPic文件夹下了哦(╯3╰)').then(function(success) {
                   // success
                 }, function(error) {
                   // error
@@ -111,9 +112,8 @@ angular.module('starter.controllers', [])
                   // error
                 });
               }, function(progress) {
-                $timeout(function() {
-                  $scope.downloadProgress = (progress.loaded / progress.total) * 100;
-                });
+                console.log((progress.loaded / progress.total) * 100);
+                
               });
 
           }, fail);

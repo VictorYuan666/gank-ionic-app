@@ -4,7 +4,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('FuliCtrl', function($scope, $ionicModal, $http, $ionicActionSheet, $ionicPopup, $timeout, $cordovaFileTransfer, httpService) {
+.controller('FuliCtrl', function($scope, $ionicModal, $http, $ionicActionSheet, $ionicPopup, $timeout, $cordovaFileTransfer, $cordovaToast, httpService) {
   var url = 'http://gank.io/api/data/%E7%A6%8F%E5%88%A9/10/';
   var page = 2;
   $scope.items = [];
@@ -22,7 +22,7 @@ angular.module('starter.controllers', [])
 
   $scope.loadMore = function() {
     httpService.dataList(url + (page++), function(data) {
-      console.log(data);
+      // console.log(data);
       $scope.items = $scope.items.concat(data);
       $scope.$broadcast('scroll.infiniteScrollComplete');
     }, function(data) {
@@ -69,9 +69,17 @@ angular.module('starter.controllers', [])
       }, ]
     });
     myPopup.then(function(res) {
-      console.log('Tapped!', res);
+
+
       var dd = function() {
         window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, function(fs) {
+          fs.root.getDirectory("gankPic", {
+              create: true
+            },
+            function(fileEntry) {},
+            function() {
+              console.log("创建目录失败");
+            });
 
           console.log('file system open: ' + fs.name);
 
@@ -83,15 +91,25 @@ angular.module('starter.controllers', [])
             create: true,
             exclusive: false
           }, function(fileEntry) {
-            console.log(fileEntry.fullPath);
+            console.log(fileEntry.toURL());
             var options = {};
-            $cordovaFileTransfer.download(url, 'file:///storage/emulated/0/Pictures/gank' + localFileName, options, true)
+            $cordovaFileTransfer.download(url, 'file:///storage/emulated/0/gankPic/' + localFileName, options, true)
               .then(function(result) {
                 console.log(result);
                 // Success!
+                $cordovaToast.showLongBottom('图片已经在gankPic文件夹下了哦(╯3╰)').then(function(success) {
+                  // success
+                }, function(error) {
+                  // error
+                });
               }, function(err) {
                 console.log(err);
                 // Error
+                $cordovaToast.showLongBottom('图片下载失败！请稍候再试o(╯□╰)o ').then(function(success) {
+                  // success
+                }, function(error) {
+                  // error
+                });
               }, function(progress) {
                 $timeout(function() {
                   $scope.downloadProgress = (progress.loaded / progress.total) * 100;
@@ -107,6 +125,28 @@ angular.module('starter.controllers', [])
         console.log(error);
       }
       dd();
+
+      /*********上传图片***************/
+      function uploadFile() {
+        var imageURI = pickUrl;
+        if (!imageURI)
+          alert('请先选择本地图片');
+        var options = new FileUploadOptions();
+        options.fileKey = "file";
+        options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+        options.mimeType = "image/jpeg";
+        var ft = new FileTransfer();
+        ft.upload(
+          imageURI,
+          encodeURI('http://192.168.93.114:1988/shandongTree/upload.jsp'),
+          function() {
+            alert('上传成功!');
+          },
+          function() {
+            alert('上传失败!');
+          },
+          options);
+      }
 
     });
 

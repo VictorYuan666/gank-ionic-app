@@ -7,7 +7,7 @@ angular.module('starter.services', [])
         method: 'GET',
       }).success(function(picBgData, header, config, status) {
 
-        console.log(picBgData.results);
+        // console.log(picBgData.results);
         imageDatas = picBgData.results;
       });
     })();

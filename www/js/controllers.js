@@ -55,106 +55,223 @@ angular.module('starter.controllers', [])
     $scope.modal.hide();
     $scope.modal.remove();
   };
-$scope.slideChanged=function (index) {
-  $scope.activeSlide = index;
-  console.log(index);
-};
-  $scope.onSwipeUp = function() {
-    var myPopup = $ionicPopup.show({
-      title: '下载图片',
-      template: '是否下载当前图片？',
-      scope: $scope,
-      buttons: [{
-        text: '取消'
-      }, {
-        text: '<b>确定</b>',
-        type: 'button-positive',
-      }, ]
-    });
-    myPopup.then(function(res) {
-
-
-      var dd = function() {
-        window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, function(fs) {
-          console.log(fs.root.fullPath);
-          fs.root.getDirectory("gankPic", {
-              create: true
-            },
-            function(fileEntry) {},
-            function() {
-              console.log("创建目录失败");
-            });
-
-          console.log('file system open: ' + cordova.file.externalRootDirectory);
-
-          // Make sure you add the domain name to the Content-Security-Policy <meta> element.
-          var url = $scope.items[$scope.activeSlide].url;
-          var localFileName = url.substring(url.lastIndexOf('/') + 1);
-          // Parameters passed to getFile create a new file or return the file if it already exists.
-          fs.root.getFile(localFileName, {
-            create: true,
-            exclusive: false
-          }, function(fileEntry) {
-            console.log(fileEntry);
-            var options = {};
-            $cordovaFileTransfer.download(url, cordova.file.externalRootDirectory+'gankPic/' + localFileName, options, true)
-              .then(function(result) {
-                console.log(result);
-                // Success!
-                $cordovaToast.showLongBottom('图片已经下到gankPic文件夹下了哦(╯3╰)').then(function(success) {
-                  // success
-                }, function(error) {
-                  // error
-                });
-              }, function(err) {
-                console.log(err);
-                // Error
-                $cordovaToast.showLongBottom('图片下载失败！请稍候再试o(╯□╰)o ').then(function(success) {
-                  // success
-                }, function(error) {
-                  // error
-                });
-              }, function(progress) {
-                console.log(Math.round((progress.loaded / progress.total) * 100)+'%');
-
-              });
-
-          }, fail);
-
-        }, fail);
-      };
-
-      function fail(error) {
-        console.log(error);
-      }
-      dd();
-
-      /*********上传图片***************/
-      function uploadFile() {
-        var imageURI = pickUrl;
-        if (!imageURI)
-          alert('请先选择本地图片');
-        var options = new FileUploadOptions();
-        options.fileKey = "file";
-        options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
-        options.mimeType = "image/jpeg";
-        var ft = new FileTransfer();
-        ft.upload(
-          imageURI,
-          encodeURI('http://192.168.93.114:1988/shandongTree/upload.jsp'),
-          function() {
-            alert('上传成功!');
-          },
-          function() {
-            alert('上传失败!');
-          },
-          options);
-      }
-
-    });
-
-
+  $scope.slideChanged = function(index) {
+    $scope.activeSlide = index;
+    console.log(index);
   };
+  $scope.onSwipeUp = function() {
+
+    $ionicActionSheet.show({
+      titleText: '更多操作',
+      buttons: [{
+        text: '<span><i class="icon ion-android-open"></i>分享到微信</span> '
+      }, {
+        text: '<span><i class="icon ion-android-download"></i>下载到本地</span>'
+      }, {
+        text: '<span><i class="icon ion-reply"></i>取消</span>'
+      }],
+
+      buttonClicked: function(index) {
+        switch (index) {
+          case 0:
+          //分享到微信
+          Wechat.isInstalled(function(installed) {
+            console.log(installed);
+            if (installed === 0) {
+              alert("微信未安装(⊙o⊙)…");
+            } else {
+              Wechat.share({
+                message: {
+                  title: "Hi, Title",
+                  description: "This is description.",
+                  mediaTagName: "TEST-TAG-001",
+                  messageExt: "这是第三方带的测试字段",
+                  messageAction: "<action>dotalist</action>",
+                  media: {
+                    type: Wechat.Type.IMAGE,
+                    image: $scope.items[$scope.activeSlide].url
+                  }
+                },
+                scene: Wechat.Scene.TIMELINE // share to Timeline
+              }, function() {
+                alert("成功分享到微信！O(∩_∩)O");
+              }, function(reason) {
+                alert("分享到微信失败: " + reason);
+              });
+            }
+
+          }, function(reason) {
+            console.log(reason);
+            alert("Failed: " + reason);
+          });
+
+
+            break;
+          case 1:
+          //下载到本地
+            var dd = function() {
+              window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, function(fs) {
+                console.log(fs.root.fullPath);
+                fs.root.getDirectory("gankPic", {
+                    create: true
+                  },
+                  function(fileEntry) {},
+                  function() {
+                    console.log("创建目录失败");
+                  });
+
+                console.log('file system open: ' + cordova.file.externalRootDirectory);
+
+                // Make sure you add the domain name to the Content-Security-Policy <meta> element.
+                var url = $scope.items[$scope.activeSlide].url;
+                var localFileName = url.substring(url.lastIndexOf('/') + 1);
+                // Parameters passed to getFile create a new file or return the file if it already exists.
+                fs.root.getFile(localFileName, {
+                  create: true,
+                  exclusive: false
+                }, function(fileEntry) {
+                  console.log(fileEntry);
+                  var options = {};
+                  $cordovaFileTransfer.download(url, cordova.file.externalRootDirectory + 'gankPic/' + localFileName, options, true)
+                    .then(function(result) {
+                      console.log(result);
+                      // Success!
+                      $cordovaToast.showLongBottom('图片已经下到gankPic文件夹下了哦(╯3╰)').then(function(success) {
+                        // success
+                      }, function(error) {
+                        // error
+                      });
+                    }, function(err) {
+                      console.log(err);
+                      // Error
+                      $cordovaToast.showLongBottom('图片下载失败！请稍候再试o(╯□╰)o ').then(function(success) {
+                        // success
+                      }, function(error) {
+                        // error
+                      });
+                    }, function(progress) {
+                      console.log(Math.round((progress.loaded / progress.total) * 100) + '%');
+
+                    });
+
+                }, fail);
+
+              }, fail);
+            };
+
+            function fail(error) {
+              console.log(error);
+            }
+             dd();
+            break;
+          case 2:
+          //取消
+
+            break;
+          default:
+
+
+        }
+        return true;
+      },
+
+    });
+  };
+
+
+  // var myPopup = $ionicPopup.show({
+  //   title: '下载图片',
+  //   template: '是否下载当前图片？',
+  //   scope: $scope,
+  //   buttons: [{
+  //     text: '取消'
+  //   }, {
+  //     text: '<b>确定</b>',
+  //     type: 'button-positive',
+  //   }, ]
+  // });
+  // myPopup.then(function(res) {
+  //   var dd = function() {
+  //     window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, function(fs) {
+  //       console.log(fs.root.fullPath);
+  //       fs.root.getDirectory("gankPic", {
+  //           create: true
+  //         },
+  //         function(fileEntry) {},
+  //         function() {
+  //           console.log("创建目录失败");
+  //         });
+  //
+  //       console.log('file system open: ' + cordova.file.externalRootDirectory);
+  //
+  //       // Make sure you add the domain name to the Content-Security-Policy <meta> element.
+  //       var url = $scope.items[$scope.activeSlide].url;
+  //       var localFileName = url.substring(url.lastIndexOf('/') + 1);
+  //       // Parameters passed to getFile create a new file or return the file if it already exists.
+  //       fs.root.getFile(localFileName, {
+  //         create: true,
+  //         exclusive: false
+  //       }, function(fileEntry) {
+  //         console.log(fileEntry);
+  //         var options = {};
+  //         $cordovaFileTransfer.download(url, cordova.file.externalRootDirectory + 'gankPic/' + localFileName, options, true)
+  //           .then(function(result) {
+  //             console.log(result);
+  //             // Success!
+  //             $cordovaToast.showLongBottom('图片已经下到gankPic文件夹下了哦(╯3╰)').then(function(success) {
+  //               // success
+  //             }, function(error) {
+  //               // error
+  //             });
+  //           }, function(err) {
+  //             console.log(err);
+  //             // Error
+  //             $cordovaToast.showLongBottom('图片下载失败！请稍候再试o(╯□╰)o ').then(function(success) {
+  //               // success
+  //             }, function(error) {
+  //               // error
+  //             });
+  //           }, function(progress) {
+  //             console.log(Math.round((progress.loaded / progress.total) * 100) + '%');
+  //
+  //           });
+  //
+  //       }, fail);
+  //
+  //     }, fail);
+  //   };
+  //
+  //   function fail(error) {
+  //     console.log(error);
+  //   }
+  //   // dd();
+  //
+  //   /*********上传图片***************/
+  //   function uploadFile() {
+  //     var imageURI = pickUrl;
+  //     if (!imageURI)
+  //       alert('请先选择本地图片');
+  //     var options = new FileUploadOptions();
+  //     options.fileKey = "file";
+  //     options.fileName = imageURI.substr(imageURI.lastIndexOf('/') + 1);
+  //     options.mimeType = "image/jpeg";
+  //     var ft = new FileTransfer();
+  //     ft.upload(
+  //       imageURI,
+  //       encodeURI('http://192.168.93.114:1988/shandongTree/upload.jsp'),
+  //       function() {
+  //         alert('上传成功!');
+  //       },
+  //       function() {
+  //         alert('上传失败!');
+  //       },
+  //       options);
+  //   }
+  //
+  // });
+
+
+
 })
 
 .controller('WebCtrl', function($scope, $http, $timeout, httpService, myService) {
@@ -164,7 +281,7 @@ $scope.slideChanged=function (index) {
     $scope.webDatas = [];
     $scope.pageTitle = "前端";
 
-    
+
     $scope.openLink = function(url) {
       console.log(url);
       window.open(url, '_blank', 'location=yes');
@@ -421,4 +538,31 @@ $scope.slideChanged=function (index) {
   })
   .controller('AboutCtrl', function($scope) {
     $scope.pageTitle = "关于";
+
+    $scope.share = function() {
+      var hideSheet = $ionicActionSheet.show({
+        buttons: [{
+          text: '<b>Share</b> This'
+        }, {
+          text: 'Move'
+        }],
+        destructiveText: 'Delete',
+        titleText: 'Modify your album',
+        cancelText: 'Cancel',
+        cancel: function() {
+          // add cancel code..
+        },
+        buttonClicked: function(index) {
+          return true;
+        }
+      });
+      $timeout(function() {
+        hideSheet();
+      }, 2000);
+    };
+
+    $scope.share1 = function() {
+
+
+    };
   });

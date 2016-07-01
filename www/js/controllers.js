@@ -55,7 +55,10 @@ angular.module('starter.controllers', [])
     $scope.modal.hide();
     $scope.modal.remove();
   };
-
+$scope.slideChanged=function (index) {
+  $scope.activeSlide = index;
+  console.log(index);
+};
   $scope.onSwipeUp = function() {
     var myPopup = $ionicPopup.show({
       title: '下载图片',
@@ -112,8 +115,8 @@ angular.module('starter.controllers', [])
                   // error
                 });
               }, function(progress) {
-                console.log((progress.loaded / progress.total) * 100);
-                
+                console.log(Math.round((progress.loaded / progress.total) * 100)+'%');
+
               });
 
           }, fail);

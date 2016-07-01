@@ -164,30 +164,7 @@ $scope.slideChanged=function (index) {
     $scope.webDatas = [];
     $scope.pageTitle = "前端";
 
-    // $http({
-    //   url: 'http://apis.baidu.com/txapi/mvtp/meinv?num=10',
-    //   method: 'GET',
-    //   headers: {
-    //     'apikey': '4228025fb23c56c0218c0c5ba28195d5'
-    //   },
-    // }).success(function(picBgData, header, config, status) {
-    //   //响应成功
-    //   console.log(picBgData);
-    //   $scope.beautyBg = picBgData.newslist;
-    //   angular.forEach($scope.webDatas, function(data, index, array) {
-    //     //data等价于array[index]
-    //     data.picUrl = picBgData.newslist[index].picUrl;
-    //     console.log(data);
-    //   });
-    //
-    // }).error(function(data, header, config, status) {
-    //   //处理响应失败
-    //   console.log(data);
-    // });
-
-    // console.log(myService.imageDatas);
-    // $scope.galleryDatas = myService.imageDatas();
-
+    
     $scope.openLink = function(url) {
       console.log(url);
       window.open(url, '_blank', 'location=yes');

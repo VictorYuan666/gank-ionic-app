@@ -1,1 +1,48 @@
 /* Empty. Add your own CSS if you like */
+
+.icon-friend-open {
+  display: inline-block;
+  height: 18px;
+  width: 18px;
+  background: url('../img/icon-friend.png') no-repeat center;
+  background-size: contain;
+  vertical-align: middle;
+  margin-right: 14px;
+}
+.icon-wechat-open {
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+  background: url('../img/icon-wechat.png') no-repeat center;
+  background-size: contain;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.icon-weibo-open {
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+  background: url('../img/icon-weibo.png') no-repeat center;
+  background-size: contain;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.icon-download {
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+  background: url('../img/icon-download.png') no-repeat center;
+  background-size: contain;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.icon-cancel {
+  display: inline-block;
+  height: 18px;
+  width: 18px;
+  background: url('../img/icon-cancel.png') no-repeat center;
+  background-size: contain;
+  vertical-align: middle;
+  margin-right: 16px;
+  margin-bottom: 3px;
+}

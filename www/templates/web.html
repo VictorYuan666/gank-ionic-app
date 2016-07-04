@@ -5,21 +5,23 @@
   <ion-content class="">
     <ion-refresher pulling-text="下拉刷新" on-refresh="doRefresh()"></ion-refresher>
 
-    <div class="list card" ng-repeat="webData in webDatas">
+    <div class="list card animate-repeat" ng-repeat="webData in webDatas">
       <a ng-click="openLink(webData.url)">
         <div class="item item-image" style="position: relative;height: 200px;">
           <img src="{{webData.picUrl}}" class="left-image blur">
           <div class="mask"></div>
           <div class="item-div ">
             <h2 style="font-size:24px;margin-bottom:20px;color: white;">{{webData.desc}}</h2>
+            <div>
             <span style="font-size:12px;color: white;">author: {{webData.who}}</span>
             <span style="font-size:12px;margin-left: 10px;color: white;">time: {{(webData.publishedAt).split('T')[0]}}</span>
+            </div>
           </div>
         </div>
       </a>
     </div>
 
-    <ion-infinite-scroll on-infinite="loadMore()">
+    <ion-infinite-scroll ng-if="Loaded" on-infinite="loadMore()">
       <ion-spinner icon="dots" class="spinner-dark spinner spinner-dots"></ion-spinner>
     </ion-infinite-scroll>
   </ion-content>

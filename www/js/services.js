@@ -46,4 +46,42 @@ angular.module('starter.services', [])
 
       }
     };
+  })
+  .factory('wechatService', function($injector) {
+    var shareToWechat = function(options) {
+      Wechat.isInstalled(function(installed) {
+        console.log(installed);
+        if (installed === 0) {
+          $cordovaToast.showLongBottom("微信未安装(⊙o⊙)…");
+        } else {
+          Wechat.share({
+            message: {
+              title: options.title?options.title:'',
+              description: options.description?options.description:'',
+              thumb: options.thumb?options.thumb:'',
+              mediaTagName: "TEST-TAG-001",
+              messageExt: "这是第三方带的测试字段",
+              messageAction: "<action>dotalist</action>",
+              media: options.media
+            },
+            scene: options.scene //Wechat.Scene.TIMELINE  FAVORITE: 2 SESSION: 0 TIMELINE: 1
+          }, function() {
+            $cordovaToast.showLongBottom("成功分享到微信！O(∩_∩)O");
+          }, function(reason) {
+            $cordovaToast.showLongBottom(reason);
+          });
+        }
+
+      }, function(reason) {
+        console.log(reason);
+        alert("Failed: " + reason);
+      });
+
+    };
+    return {
+      shareToWechat: function(options) {
+        return shareToWechat(options);
+
+      }
+    };
   });

@@ -4,7 +4,7 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('FuliCtrl', function($scope, $ionicModal, $http, $ionicActionSheet, $ionicPopup, $timeout, $cordovaFileTransfer, $cordovaToast, httpService) {
+.controller('FuliCtrl', function($scope, $ionicModal, $http, $ionicActionSheet, $ionicPopup, $timeout, $cordovaFileTransfer, $cordovaToast, httpService, wechatService) {
   var url = 'http://gank.io/api/data/%E7%A6%8F%E5%88%A9/10/';
   var page = 2;
   $scope.items = [];
@@ -74,10 +74,7 @@ angular.module('starter.controllers', [])
             mediaTagName: "TEST-TAG-001",
             messageExt: "这是第三方带的测试字段",
             messageAction: "<action>dotalist</action>",
-            media: {
-              type: Wechat.Type.IMAGE,
-              image: $scope.items[$scope.activeSlide].url
-            }
+            media: options.media
           },
           scene: options.scene //Wechat.Scene.TIMELINE  FAVORITE: 2 SESSION: 0 TIMELINE: 1
         }, function() {
@@ -113,19 +110,43 @@ angular.module('starter.controllers', [])
         switch (index) {
           case 0:
             //分享到微信朋友圈
-            shareToWechat({
-              scene: 1
+            wechatService.shareToWechat({
+              scene: 1,
+              thumb: $scope.items[$scope.activeSlide].url,
+
+              media: {
+                type: Wechat.Type.IMAGE,
+                image: $scope.items[$scope.activeSlide].url,
+              }
             });
 
             break;
           case 1:
 
-            shareToWechat({
-              scene: 0
+            wechatService.shareToWechat({
+              scene: 0,
+              thumb: $scope.items[$scope.activeSlide].url,
+
+              media: {
+                type: Wechat.Type.IMAGE,
+                image: $scope.items[$scope.activeSlide].url,
+
+              }
             });
             break;
 
           case 2:
+          wechatService.shareToWechat({
+            title: $scope.items[$scope.activeSlide].type,
+            description: $scope.items[$scope.activeSlide].desc,
+            scene: 0,
+            thumb: $scope.items[$scope.activeSlide].url,
+
+            media: {
+              type: Wechat.Type.LINK,
+              webpageUrl: $scope.items[$scope.activeSlide].url,
+            }
+          });
             // console.log(YCWeibo);
 
             var shareToWeibo = function() {
@@ -142,14 +163,10 @@ angular.module('starter.controllers', [])
                   });
                 } else {
                   $cordovaToast.showLongBottom("请先安装微博官方客户端o(╯□╰)o");
-
                 }
-
               });
-
-
             };
-            shareToWeibo();
+            // shareToWeibo();
             // YCWeibo.checkClientInstalled(function() {
             //   console.log('client is installed');
             //
@@ -244,8 +261,8 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('WebCtrl', function($scope, $http, $timeout, httpService, myService) {
-    var url = 'http://gank.io/api/data/%E5%89%8D%E7%AB%AF/10/';
+.controller('WebCtrl', function($scope, $http, $timeout, $cordovaToast, httpService, myService) {
+    var url = 'http://gank.io/api/data/%E5%89%8D%E7%AB%AF/50/';
     var page = 2;
     // var url = 'data.json';
     $scope.webDatas = [];
@@ -258,6 +275,7 @@ angular.module('starter.controllers', [])
     };
     $scope.doRefresh = function() {
       httpService.dataList(url + "1", function(datas) {
+
         angular.forEach(datas, function(data, index, array) {
           data.picUrl = myService.randomImageUrl();
         });
@@ -268,13 +286,24 @@ angular.module('starter.controllers', [])
       });
     };
     $scope.doRefresh();
+    $scope.Loaded = true;
     $scope.loadMore = function() {
       httpService.dataList(url + (page++), function(datas) {
-        angular.forEach(datas, function(data, index, array) {
-          data.picUrl = myService.randomImageUrl();
-        });
-        $scope.webDatas = $scope.webDatas.concat(datas);
-        $scope.$broadcast('scroll.infiniteScrollComplete');
+        console.log(datas.length);
+        if (datas.length === 0) {
+
+          $scope.Loaded = false;
+          $cordovaToast.showLongBottom("没有更多数据了哦~");
+          return;
+        } else {
+          $scope.Loaded = true;
+          angular.forEach(datas, function(data, index, array) {
+            data.picUrl = myService.randomImageUrl();
+          });
+          $scope.webDatas = $scope.webDatas.concat(datas);
+          $scope.$broadcast('scroll.infiniteScrollComplete');
+        }
+
       }, function(data) {
         console.log(data);
       });

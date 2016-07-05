@@ -43,7 +43,7 @@ angular.module('starter.controllers', [])
   $scope.showModal = function(templateUrl) {
     $ionicModal.fromTemplateUrl(templateUrl, {
       scope: $scope,
-      animation: 'slide-in-up'
+      animation: 'fadeIn'
     }).then(function(modal) {
       $scope.modal = modal;
       $scope.modal.show();
@@ -60,38 +60,8 @@ angular.module('starter.controllers', [])
     console.log(index);
   };
 
-  var shareToWechat = function(options) {
-    Wechat.isInstalled(function(installed) {
-      console.log(installed);
-      if (installed === 0) {
-        $cordovaToast.showLongBottom("微信未安装(⊙o⊙)…");
-      } else {
-        Wechat.share({
-          message: {
-            title: "Title",
-            description: "description.",
-            thumb: $scope.items[$scope.activeSlide].url,
-            mediaTagName: "TEST-TAG-001",
-            messageExt: "这是第三方带的测试字段",
-            messageAction: "<action>dotalist</action>",
-            media: options.media
-          },
-          scene: options.scene //Wechat.Scene.TIMELINE  FAVORITE: 2 SESSION: 0 TIMELINE: 1
-        }, function() {
-          $cordovaToast.showLongBottom("成功分享到微信！O(∩_∩)O");
-        }, function(reason) {
-          $cordovaToast.showLongBottom(reason);
-        });
-      }
-
-    }, function(reason) {
-      console.log(reason);
-      alert("Failed: " + reason);
-    });
-
-  };
   $scope.onSwipeUp = function() {
-    console.log(Wechat);
+
     $ionicActionSheet.show({
       titleText: '更多操作',
       buttons: [{
@@ -136,19 +106,6 @@ angular.module('starter.controllers', [])
             break;
 
           case 2:
-          wechatService.shareToWechat({
-            title: $scope.items[$scope.activeSlide].type,
-            description: $scope.items[$scope.activeSlide].desc,
-            scene: 0,
-            thumb: $scope.items[$scope.activeSlide].url,
-
-            media: {
-              type: Wechat.Type.LINK,
-              webpageUrl: $scope.items[$scope.activeSlide].url,
-            }
-          });
-            // console.log(YCWeibo);
-
             var shareToWeibo = function() {
 
               window.weibo.isInstalled(function(status) {
@@ -159,14 +116,14 @@ angular.module('starter.controllers', [])
                     data: $scope.items[$scope.activeSlide].url,
                     text: '通过干货集中营客户端分享给你一张美图~(≧▽≦)/~'
                   }, function(res) {
-                    $cordovaToast.showLongBottom(res);
+                    $cordovaToast.showLongBottom("成功分享到微博！O(∩_∩)O");
                   });
                 } else {
                   $cordovaToast.showLongBottom("请先安装微博官方客户端o(╯□╰)o");
                 }
               });
             };
-            // shareToWeibo();
+            shareToWeibo();
             // YCWeibo.checkClientInstalled(function() {
             //   console.log('client is installed');
             //
@@ -261,14 +218,84 @@ angular.module('starter.controllers', [])
 
 })
 
-.controller('WebCtrl', function($scope, $http, $timeout, $cordovaToast, httpService, myService) {
-    var url = 'http://gank.io/api/data/%E5%89%8D%E7%AB%AF/50/';
+.controller('WebCtrl', function($scope, $http, $timeout, $cordovaToast, $ionicActionSheet, httpService, wechatService, myService) {
+    var url = 'http://gank.io/api/data/%E5%89%8D%E7%AB%AF/10/';
     var page = 2;
     // var url = 'data.json';
     $scope.webDatas = [];
     $scope.pageTitle = "前端";
 
+    $scope.onHold = function(itemDatas) {
+      console.log(itemDatas);
+      $ionicActionSheet.show({
+        titleText: '更多操作',
+        buttons: [{
+          text: '<span><i class="icon-friend-open"></i>分享到微信朋友圈</span> '
+        }, {
+          text: '<span><i class="icon-wechat-open"></i>分享给微信好友</span> '
+        }, {
+          text: '<span><i class="icon-wechat-fav"></i>收藏到微信</span> '
+        }, {
+          text: '<span><i class="icon-cancel"></i>取消</span>'
+        }],
 
+        buttonClicked: function(index) {
+          switch (index) {
+            case 0:
+              //分享到微信朋友圈
+              wechatService.shareToWechat({
+                title: itemDatas.desc,
+                description: itemDatas.type,
+                scene: 1,
+                thumb: itemDatas.picUrl,
+
+                media: {
+                  type: Wechat.Type.LINK,
+                  webpageUrl: itemDatas.url,
+                }
+              });
+
+              break;
+            case 1:
+            //分享给好友
+              wechatService.shareToWechat({
+                title: itemDatas.type,
+                description: itemDatas.desc,
+                scene: 0,
+                thumb: itemDatas.picUrl,
+
+                media: {
+                  type: Wechat.Type.LINK,
+                  webpageUrl: itemDatas.url,
+                }
+              });
+
+              break;
+
+            case 2:
+              //收藏
+              wechatService.shareToWechat({
+                title: itemDatas.type,
+                description: itemDatas.desc,
+                scene: 2,
+                thumb: itemDatas.picUrl,
+
+                media: {
+                  type: Wechat.Type.LINK,
+                  webpageUrl: itemDatas.url,
+                }
+              });
+              break;
+            default:
+
+
+          }
+          return true;
+        },
+
+      });
+
+    };
     $scope.openLink = function(url) {
       console.log(url);
       window.open(url, '_blank', 'location=yes');

@@ -47,10 +47,9 @@ angular.module('starter.services', [])
       }
     };
   })
-  .factory('wechatService', function($injector) {
+  .factory('wechatService', function($injector,$cordovaToast) {
     var shareToWechat = function(options) {
       Wechat.isInstalled(function(installed) {
-        console.log(installed);
         if (installed === 0) {
           $cordovaToast.showLongBottom("微信未安装(⊙o⊙)…");
         } else {
@@ -68,7 +67,8 @@ angular.module('starter.services', [])
           }, function() {
             $cordovaToast.showLongBottom("成功分享到微信！O(∩_∩)O");
           }, function(reason) {
-            $cordovaToast.showLongBottom(reason);
+            console.log(reason);
+            // $cordovaToast.showLongBottom(reason);
           });
         }
 
@@ -81,7 +81,6 @@ angular.module('starter.services', [])
     return {
       shareToWechat: function(options) {
         return shareToWechat(options);
-
       }
     };
   });

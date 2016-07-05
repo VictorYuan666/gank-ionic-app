@@ -1,8 +1,8 @@
-<ion-modal-view>
-  <div class="modal image-modal transparent" ng-click="closeModal()">
+<ion-modal-view class="animated fadeIn">
+  <div class="modal image-modal animated fadeIn " on-tap="closeModal()">
     <ion-slide-box on-slide-changed="slideChanged(index)" show-pager="false"active-slide="activeSlide">
       <ion-slide ng-repeat="item in items">
-        <img ng-src="{{item.url}}" on-swipe-up="onSwipeUp()" class=" fullscreen-image " />
+        <img ng-src="{{item.url}}" on-hold="onSwipeUp()" class=" fullscreen-image" />
       </ion-slide>
     </ion-slide-box>
   </div>

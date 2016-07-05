@@ -9,6 +9,7 @@ var sh = require('shelljs');
 var run = require('gulp-run');
 var del = require('del');
 var runSequence = require('gulp-run-sequence');
+var rename = require("gulp-rename");
 
 var paths = {
   sass: ['./scss/**/*.scss']
@@ -56,26 +57,33 @@ gulp.task('git-check', function(done) {
 });
 
 gulp.task('deleteApk', function(cb) {
-  del(['android-release-unsigned.apk']);
+  del(['android-release-signed.apk']);
   cb();
 });
 
-gulp.task('packAndroid',['deleteApk'], function(cb) {
-run('cordova build --release android').exec(cb);
-
-
-
+gulp.task('packAndroid', function(cb) {
+  run('cordova build --release android').exec(cb);
 });
 
-gulp.task('copyUnsignedApk',['packAndroid'], function () {
+gulp.task('copyUnsignedApk', function() {
   var stream = gulp.src('./platforms/android/build/outputs/apk/android-release-unsigned.apk')
+    .pipe(rename('android-release-signed.apk'))
     .pipe(gulp.dest('./'));
-    return stream;
+  return stream;
 });
 
-gulp.task('signAndroid',['copyUnsignedApk'], function(cb) {
-  run('jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore android-release-unsigned.apk alias_name -storepass qaz8650060').exec(cb);
+gulp.task('signAndroid', function(cb) {
+  run('jarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore my-release-key.keystore android-release-signed.apk alias_name -storepass qaz8650060').exec(cb);
 });
+
+gulp.task('uninstallApk', function(cb) {
+  run('adb uninstall com.yuanxiaowei.ionicGankApp').exec(cb);
+});
+
+gulp.task('installApk', ['uninstallApk'], function(cb) {
+  run('adb -s 4e68b259 install android-release-signed.apk').exec(cb);
+});
+
 gulp.task('prod', function(cb) {
-    runSequence('deleteApk', 'packAndroid', 'copyUnsignedApk', 'signAndroid', cb);
+  runSequence('deleteApk', 'packAndroid', 'copyUnsignedApk', 'signAndroid','installApk', cb);
 });
